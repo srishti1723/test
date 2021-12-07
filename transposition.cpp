@@ -1,108 +1,89 @@
 #include<bits/stdc++.h>
-using namespace std;
-string key;
-map<int,int> keyMap;
-void setPermutationOrder(){
-for(int i=0;i<key.length();i++)
+using namespace std ;
+
+string encrypt(string pt , string key)
 {
-keyMap[key[i]] = i;
+    string ct = ""; // ciphertext
+    int k = 0;      // plaintext iterator
+
+    int num_row = ceil((float) pt.length()/key.length());
+    int num_col = key.length();
+    char mat[num_row][num_col];
+    
+    cout << "\nEncryption Matrix :" << endl;
+    cout << "---------------------" << endl;
+    for(int i=0; i<num_row ; i++)
+    {
+        for(int j=0; j<num_col; j++)
+        {
+            if(k < pt.length())
+            {
+                cout << (mat[i][j] = pt[k++]) << "  ";
+            }
+            else
+            {
+                cout << (mat[i][j] = 'x') << "  " ;
+            }
+        }
+        cout << endl;
+    }
+    for(int i=0; i<num_col; i++)
+    {
+        for(int j=0; j<num_row; j++)
+        {
+            ct += mat[j][key.find(i+'1')];
+        }
+    }
+    return ct;
 }
-}
-string encryptMessage(string msg){
-int row,col,j,k=0;
-string cipher = "";
-row = ceil((float) msg.length()/key.length());
-col = key.length();
-if (msg.length() % col)
-row += 1;
-char matrix[row][col],mat[row][col];
-cout << "\nTransposition Encryption Matrix :" << endl;
-cout << "-----------------------------------" << endl;
-for(int i=0; i<row ; i++){
-for(int j=0; j<col; j++){
-if(k < msg.length())
-cout << (mat[i][j] = msg[k++]) << " ";
-else
-cout << (mat[i][j] = 'x') << " " ;
-}
-cout << endl;
-}
-for (int i=0,k=0;i<row;i++){
-for (int j=0;j<col;){
-if(msg[k] == '\0'){
-matrix[i][j] = 'x';
-j++;
-}
-if( isalpha(msg[k])){
-matrix[i][j] = msg[k];
-j++;
-}
-k++;
-}
-}
-for (auto ii=keyMap.begin();ii!=keyMap.end();++ii){
-j=ii->second;
-for (int i=0; i<row; i++){
-if( isalpha(matrix[i][j]))
-cipher += matrix[i][j];
-}
-}
-return cipher;
-}
-string decryptMessage(string cipher){
-int col = key.length();
-int row = cipher.length()/col;
-char cipherMat[row][col];
-for (int j=0,k=0; j<col; j++)
-for (int i=0; i<row; i++)
-cipherMat[i][j] = cipher[k++];
-int index = 0;
-for( auto ii=keyMap.begin();ii!=keyMap.end();++ii)
-ii->second = index++;
-char deCipher[row][col];
-auto ii=keyMap.begin();
-int k = 0;
-for (int l=0,j; key[l]!='\0'; k++){
-j = keyMap[key[l++]];
-for (int i=0; i<row; i++){
-deCipher[i][k]=cipherMat[i][j];
-}
-}
-cout << "\nTransposition Decryption Matrix :" << endl;
-cout << "-----------------------------------" << endl;
-for(int i=0;i<row ;i++){
-for(int j=0;j<col ;j++){
-if(cipherMat[i][j] != 'x')
-cout<<cipherMat[i][j]<< " ";
-}
-cout<<endl;
-}
-string msg = "";
-cout << "\nTransposition Decryption Matrix :" << endl;
-cout << "-----------------------------------" << endl;
-for (int i=0; i<row; i++){
-for(int j=0; j<col; j++){
-if(deCipher[i][j] != 'x'){
-cout << deCipher[i][j]<< " ";
-msg += deCipher[i][j];
-}
-}
-cout << endl;
-}
-return msg;
-}
-int main(void)
+
+string decrypt(string ct , string key)
 {
-string msg,cipher,decipher;
-cout << "Enter the message: ";
-cin >> msg;
-cout<<"Enter the key: ";
-cin >> key;
-cout <<endl;
-setPermutationOrder();
-cipher = encryptMessage(msg);
-cout << "Encrypted Message: " << cipher << endl;
-decipher = decryptMessage(cipher);
-cout << "Decrypted Message: " << decipher << endl;
-return 0;
+    string pt = ""; // plaintext
+    int k = 0; // ciptext iterator
+
+    int num_row = ceil((float)ct.length() / key.length());
+    int num_col = key.length();
+    char mat[num_row][num_col];
+    
+    char decryptMat[num_row][num_col];
+
+    for(int i=0; i<num_col; i++)
+    {
+        for(int j=0; j<num_row; j++)
+        {
+             mat[j][key.find(i+'1')] = ct[k];
+             decryptMat[j][i] = ct[k++];
+        }
+    }
+
+    cout << "\nDecryption Matrix :" << endl;
+    cout << "---------------------" << endl;
+    for(int i=0; i<num_row ; i++)
+    {
+        for(int j=0; j<num_col; j++)
+        {
+            cout << decryptMat[i][j] << "  ";
+            pt += mat[i][j];
+        }
+        cout << endl;
+    }
+    return pt;
+}
+
+int main()
+{
+    string plaintext , key , ciphertext , decryptext;
+
+    cout << "Enter text : ";
+    cin >> plaintext;
+
+    cout << "Enter key  : ";
+    cin >> key;
+
+    ciphertext = encrypt(plaintext , key);
+    cout << "\nEncrypted text \t: " << ciphertext << endl;
+
+    decryptext = decrypt(ciphertext , key);
+    cout << "\nDecrypted text \t: " << decryptext << endl;
 }
